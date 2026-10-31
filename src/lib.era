@@ -1,0 +1,98 @@
+// github.com/era-lang-official/sync
+// Concurrency, Queues, and Synchronization Primitives
+
+pub struct AtomicInt {
+    pub value: i64,
+}
+
+impl AtomicInt {
+    pub fn new(init: i64) -> AtomicInt {
+        return AtomicInt { value: init };
+    }
+
+    pub fn get(&self) -> i64 {
+        return self.value;
+    }
+
+    pub fn set(&mut self, v: i64) {
+        self.value = v;
+    }
+
+    pub fn add(&mut self, delta: i64) -> i64 {
+        self.value += delta;
+        return self.value;
+    }
+
+    pub fn sub(&mut self, delta: i64) -> i64 {
+        self.value -= delta;
+        return self.value;
+    }
+}
+
+pub struct Queue {
+    pub capacity: usize,
+    pub items: Vec<string>,
+}
+
+impl Queue {
+    pub fn new(capacity: usize) -> Queue {
+        return Queue {
+            capacity,
+            items: Vec::<string>::new(),
+        };
+    }
+
+    pub fn push(&mut self, msg: string) -> bool {
+        if self.items.len() >= self.capacity {
+            return false;
+        }
+        self.items.push(msg);
+        return true;
+    }
+
+    pub fn pop(&mut self) -> Option<string> {
+        if self.items.len() == 0 {
+            return None;
+        }
+        let first = self.items[0].clone();
+        let mut next = Vec::<string>::new();
+        let mut i: usize = 1;
+        while i < self.items.len() {
+            next.push(self.items[i].clone());
+            i += 1;
+        }
+        self.items = next;
+        return Some(first);
+    }
+
+    pub fn len(&self) -> usize {
+        return self.items.len();
+    }
+}
+
+pub struct RateLimiter {
+    pub max_tokens: i64,
+    pub available: i64,
+}
+
+impl RateLimiter {
+    pub fn new(tokens_per_interval: i64) -> RateLimiter {
+        return RateLimiter {
+            max_tokens: tokens_per_interval,
+            available: tokens_per_interval,
+        };
+    }
+
+    pub fn allow(&mut self) -> bool {
+        if self.available > 0 {
+            self.available -= 1;
+            return true;
+        }
+        return false;
+    }
+
+    pub fn refill(&mut self) {
+        self.available = self.max_tokens;
+    }
+}
+
